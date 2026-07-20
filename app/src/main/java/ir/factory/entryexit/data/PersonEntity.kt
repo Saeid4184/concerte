@@ -26,4 +26,10 @@ data class PersonEntity(
     val imageUri: String? = null,
     val isInside: Boolean = false,
     val lastEventAt: Long = 0L
+    var lastClickTime = 0L
+binding.btnCheckIn.setOnClickListener {
+    if (SystemClock.elapsedRealtime() - lastClickTime < 1500) return@setOnClickListener
+    lastClickTime = SystemClock.elapsedRealtime()
+    // عملیات ثبت
+}
 )
