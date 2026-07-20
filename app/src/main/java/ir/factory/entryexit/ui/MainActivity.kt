@@ -108,7 +108,11 @@ class MainActivity : AppCompatActivity() {
             startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(fullUrl)))
         }
     }
-
+    
+if (AppPreferences.getUserRole() == "ROLE_GUARD") {
+    binding.btnAdminDashboard.visibility = View.GONE // مخفی کردن پنل ادمین
+    binding.btnSettings.visibility = View.GONE
+}
     companion object {
         const val EXTRA_JUMP_TO_TYPE = "extra_jump_to_type"
     }
