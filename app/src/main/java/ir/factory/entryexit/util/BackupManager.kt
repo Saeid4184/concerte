@@ -85,6 +85,16 @@ object BackupManager {
         }
     }
 
+    class BackupWorker(context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {
+    override suspend fun doWork(): Result {
+        BackupManager.createBackup() // متد بکاپ شما
+        return Result.success()
+    }
+}
+// در SetupActivity یا FactoryApp.kt:
+val backupRequest = PeriodicWorkRequestBuilder<BackupWorker>(24, TimeUnit.HOURS).build()
+WorkManager.getInstance(context).enqueueUniquePeriodicWork("daily_backup", ExistingPeriodicWorkPolicy.KEEP, backupRequest)
+
     private fun timestamp(): String =
         SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date())
 
