@@ -133,6 +133,11 @@ class GroupedPersonAdapter(
             binding.root.setOnClickListener { onClick(person) }
             binding.root.setOnLongClickListener {
                 onLongClick(person)
+
+                // در متد onBindViewHolder
+val statusColor = if (person.status == "داخل") R.color.green_active else R.color.red_inactive
+holder.binding.statusIndicator.setBackgroundColor(ContextCompat.getColor(context, statusColor))
+
                 true
             }
         }
