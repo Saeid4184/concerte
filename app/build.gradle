@@ -58,7 +58,7 @@ dependencies {
         // محاسبات سنگین فقط زمانی انجام می‌شود که لیست در دیتابیس تغییر کند
         calculateReport(logs) 
     }.stateIn(viewModelScope, SharingStarted.Lazily, initialValue = null)
-}
+
     // Image loading (profile photos / equipment photos from device gallery)
     implementation 'com.github.bumptech.glide:glide:4.16.0'
 
