@@ -83,4 +83,9 @@
             android:src="@drawable/ic_chevron_left" />
 
     </LinearLayout>
+    
+    // در متد onBindViewHolder
+val statusColor = if (person.status == "داخل") R.color.green_active else R.color.red_inactive
+holder.binding.statusIndicator.setBackgroundColor(ContextCompat.getColor(context, statusColor))
+    
 </androidx.cardview.widget.CardView>
