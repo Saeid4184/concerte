@@ -10,7 +10,6 @@ import ir.factory.entryexit.data.PersonEntity
 import ir.factory.entryexit.data.PersonType
 import ir.factory.entryexit.databinding.ItemRosterEntryBinding
 import ir.factory.entryexit.databinding.ItemSectionHeaderBinding
-
 /** A single row shown in the roster list: either a section header or a person/machine entry. */
 sealed class RosterRow {
     data class Header(val title: String) : RosterRow()
@@ -138,6 +137,20 @@ class GroupedPersonAdapter(
 val statusColor = if (person.status == "داخل") R.color.green_active else R.color.red_inactive
 holder.binding.statusIndicator.setBackgroundColor(ContextCompat.getColor(context, statusColor))
 
+
+val itemTouchHelper = ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
+    override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+        val position = viewHolder.adapterPosition
+        val log = adapter.getItem(position)
+        viewModel.checkOut(log) // ثبت خروج در دیتابیس
+        
+        Snackbar.make(binding.root, "${log.name} خارج شد", Snackbar.LENGTH_LONG)
+            .setAction("لغو (Undo)") {
+                viewModel.undoCheckOut(log) // بازگردانی رکورد
+            }.show()
+    }
+})
+itemTouchHelper.attachToRecyclerView(binding.recyclerView)
                 true
             }
         }
