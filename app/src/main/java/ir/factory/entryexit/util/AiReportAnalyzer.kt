@@ -107,6 +107,11 @@ object AiReportAnalyzer {
         }
     }
 
+    fun getOverstayWarnings(logs: List<LogEntity>, maxHours: Int = 12): List<LogEntity> {
+    val currentTime = System.currentTimeMillis()
+    return logs.filter { it.status == "داخل" && (currentTime - it.entryTime) > TimeUnit.HOURS.toMillis(maxHours.toLong()) }
+}
+
     private fun buildPrompt(summaryText: String): String = """
         تو یک تحلیلگر داده برای یک کارخانه بتن هستی. بر اساس آمار تردد زیر (بدون هیچ نام شخصی، فقط اعداد تجمیعی)، یک تحلیل کوتاه و کاربردی به زبان فارسی ارائه بده:
         - نکات برجسته یا الگوهای غیرعادی را ذکر کن (مثلاً نسبت ورود به خروج، تراکم در یک دسته خاص و غیره)
