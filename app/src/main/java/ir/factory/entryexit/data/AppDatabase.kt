@@ -1,5 +1,5 @@
 package ir.factory.entryexit.data
-
+package net.zetetic:android-database-sqlcipher
 import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
@@ -19,6 +19,10 @@ abstract class AppDatabase : RoomDatabase() {
 
         fun getInstance(context: Context): AppDatabase {
             return INSTANCE ?: synchronized(this) {
+                
+                val factory = SupportFactory("FactorySecurePass2026!".toByteArray())
+Room.databaseBuilder(context, AppDatabase::class.java, "factory_db")
+    .openHelperFactory(factory)
                 INSTANCE ?: Room.databaseBuilder(context.applicationContext, AppDatabase::class.java, DB_NAME)
                     .build()
                     .also { INSTANCE = it }
