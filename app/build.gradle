@@ -55,7 +55,7 @@ dependencies {
     implementation 'androidx.viewpager2:viewpager2:1.0.0'
     implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
     implementation 'androidx.documentfile:documentfile:1.0.1'
-    debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.14
+    implementation 'com.squareup.leakcanary:leakcanary-android:2.14
 class FactoryViewModel @Inject constructor(private val repository: Repository) : ViewModel() {
     val reportStats = repository.getLogs().map { logs ->
         // محاسبات سنگین فقط زمانی انجام می‌شود که لیست در دیتابیس تغییر کند
