@@ -56,7 +56,12 @@ class MainActivity : AppCompatActivity() {
         }
 
         // نمایش/مخفی کردن دکمه‌ها بر اساس نقش کاربر
-        if (AppPreferences.getUserRole() == "ROLE_GUARD") {
+        setupButtonVisibility()
+    }
+
+    private fun setupButtonVisibility() {
+        val userRole = AppPreferences.getUserRole()
+        if (userRole == "ROLE_GUARD") {
             binding.btnAdminDashboard.visibility = View.GONE
             binding.btnSettings.visibility = View.GONE
         }
@@ -113,6 +118,8 @@ class MainActivity : AppCompatActivity() {
         val fullUrl = if (url.startsWith("http://") || url.startsWith("https://")) url else "https://$url"
         runCatching {
             startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(fullUrl)))
+        }.onFailure { exception ->
+            exception.printStackTrace()
         }
     }
 
