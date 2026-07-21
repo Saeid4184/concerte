@@ -86,6 +86,7 @@ object BackupManager {
         }
     }
 
-    private fun timestamp(): String =
-        SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date())
-}
+   private fun timestamp(): String =
+    SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date())
+
+private const val MAX_BACKUPS = 20
