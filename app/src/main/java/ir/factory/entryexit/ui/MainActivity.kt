@@ -109,7 +109,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
     
-if (AppPreferences.getUserRole() == "ROLE_GUARD") {
+    if (AppPreferences.getUserRole) == "ROLE_GUARD") {
     binding.btnAdminDashboard.visibility = View.GONE // مخفی کردن پنل ادمین
     binding.btnSettings.visibility = View.GONE
 }
