@@ -55,7 +55,7 @@ class MainActivity : AppCompatActivity() {
             type?.let { binding.viewPager.setCurrentItem(pagerAdapter.positionOf(it), false) }
         }
 
-        // نمایش/مخفی کردن دکمه‌ها بر اساس نقش کاربر
+        // Show/hide buttons based on user role
         setupButtonVisibility()
     }
 
