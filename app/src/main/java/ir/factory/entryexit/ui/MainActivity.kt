@@ -1,11 +1,11 @@
 package ir.factory.entryexit.ui
 
-import android.view.View
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.tabs.TabLayoutMediator
@@ -53,6 +53,12 @@ class MainActivity : AppCompatActivity() {
         intent?.getStringExtra(EXTRA_JUMP_TO_TYPE)?.let { typeName ->
             val type = runCatching { PersonType.valueOf(typeName) }.getOrNull()
             type?.let { binding.viewPager.setCurrentItem(pagerAdapter.positionOf(it), false) }
+        }
+
+        // نمایش/مخفی کردن دکمه‌ها بر اساس نقش کاربر
+        if (AppPreferences.getUserRole() == "ROLE_GUARD") {
+            binding.btnAdminDashboard.visibility = View.GONE
+            binding.btnSettings.visibility = View.GONE
         }
     }
 
@@ -109,21 +115,7 @@ class MainActivity : AppCompatActivity() {
             startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(fullUrl)))
         }
     }
-    
-  override fun onCreate(savedInstanceState: Bundle?) {
-    super.onCreate(savedInstanceState)
-    binding = ActivityMainBinding.inflate(layoutInflater)
-    setContentView(binding.root)
-    
-    // ... existing code ...
-    
-    // Add this block here
-    if (AppPreferences.getUserRole() == "ROLE_GUARD") {
-        binding.btnAdminDashboard.visibility = View.GONE
-        binding.btnSettings.visibility = View.GONE
-    }
-}
-}
+
     companion object {
         const val EXTRA_JUMP_TO_TYPE = "extra_jump_to_type"
     }
