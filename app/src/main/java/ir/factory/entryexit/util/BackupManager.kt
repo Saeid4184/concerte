@@ -5,11 +5,17 @@ import android.content.Context
 import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
+import androidx.work.CoroutineWorker
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
+import androidx.work.WorkerParameters
 import ir.factory.entryexit.data.AppDatabase
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import java.util.concurrent.TimeUnit
 
 /**
  * Copies the live Room database file to a public backup location so the check-in/out history
@@ -86,7 +92,22 @@ object BackupManager {
         }
     }
 
-   private fun timestamp(): String =
-    SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date())
+    private fun timestamp(): String =
+        SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date())
 
-private const val MAX_BACKUPS = 20
+    class BackupWorker(context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {
+        override suspend fun doWork(): Result {
+            backupNow(applicationContext)
+            return Result.success()
+        }
+    }
+
+    fun schedulePeriodicBackup(context: Context) {
+        val backupRequest = PeriodicWorkRequestBuilder<BackupWorker>(24, TimeUnit.HOURS).build()
+        WorkManager.getInstance(context).enqueueUniquePeriodicWork(
+            "daily_backup",
+            ExistingPeriodicWorkPolicy.KEEP,
+            backupRequest
+        )
+    }
+}
