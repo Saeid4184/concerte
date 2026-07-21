@@ -69,7 +69,7 @@ dependencies {
 
     debugimplementation 'com.squareup.leakcanary:leakcanary-android:2.14'
 class FactoryViewModel {
-    Inject constructor(private val repository: Repository) : ViewModel() {
+    Inject constructor(private val Repository) : ViewModel() {
     val reportStats = repository.getLogs().map { logs ->
     }
     }
