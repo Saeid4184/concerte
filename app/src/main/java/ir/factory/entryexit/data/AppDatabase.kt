@@ -20,12 +20,12 @@ abstract class AppDatabase : RoomDatabase() {
 
         fun getInstance(context: Context): AppDatabase {
             return INSTANCE ?: synchronized(this) {
-                
                 val factory = SupportFactory("FactorySecurePass2026!".toByteArray())
-Room.databaseBuilder(context, AppDatabase::class.java, "factory_db")
-    .openHelperFactory(factory)
+                val instance = Room.databaseBuilder(context, AppDatabase::class.java, DB_NAME)
+                    .openHelperFactory(factory)
                     .build()
-                    .also { INSTANCE = it }
+                INSTANCE = instance
+                instance
             }
         }
     }
