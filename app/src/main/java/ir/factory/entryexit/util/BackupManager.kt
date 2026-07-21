@@ -1,113 +1,129 @@
-package ir.factory.entryexit.util
+package ir.factory.entryexit.ui
 
-import android.content.ContentValues
-import android.content.Context
-import android.os.Build
-import android.os.Environment
-import android.provider.MediaStore
-import androidx.work.CoroutineWorker
-import androidx.work.ExistingPeriodicWorkPolicy
-import androidx.work.PeriodicWorkRequestBuilder
-import androidx.work.WorkManager
-import androidx.work.WorkerParameters
-import ir.factory.entryexit.data.AppDatabase
-import java.io.File
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
-import java.util.concurrent.TimeUnit
+import android.content.Intent
+import android.net.Uri
+import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
+import android.view.View
+import androidx.appcompat.app.AppCompatActivity
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.tabs.TabLayoutMediator
+import ir.factory.entryexit.R
+import ir.factory.entryexit.data.PersonType
+import ir.factory.entryexit.databinding.ActivityMainBinding
+import ir.factory.entryexit.util.AppPreferences
 
-/**
- * Copies the live Room database file to a public backup location so the check-in/out history
- * survives even if the app is closed, reset, or reinstalled. Runs on every successful check-in
- * or check-out (cheap: SQLite files here stay well under a few MB), always from a background
- * thread — callers are expected to invoke it inside a coroutine.
- */
-object BackupManager {
+class MainActivity : AppCompatActivity() {
 
-    private const val BACKUP_FOLDER = "ConcreteFactoryBackups"
-    private const val MAX_BACKUPS = 20
+    private lateinit var binding: ActivityMainBinding
+    private lateinit var pagerAdapter: CategoryPagerAdapter
 
-    fun backupNow(context: Context) {
-        try {
-            val dbFile = context.getDatabasePath(AppDatabase.DB_NAME)
-            if (!dbFile.exists()) return
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-            val fileName = "backup_${timestamp()}.db"
+        setSupportActionBar(binding.toolbar)
+        supportActionBar?.title = getString(R.string.app_name)
+        binding.toolbar.logo = androidx.core.content.ContextCompat.getDrawable(this, R.drawable.app_logo)
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                val values = ContentValues().apply {
-                    put(MediaStore.MediaColumns.DISPLAY_NAME, fileName)
-                    put(MediaStore.MediaColumns.MIME_TYPE, "application/octet-stream")
-                    put(MediaStore.MediaColumns.RELATIVE_PATH, "${Environment.DIRECTORY_DOWNLOADS}/$BACKUP_FOLDER")
-                }
-                val resolver = context.contentResolver
-                val uri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, values) ?: return
-                resolver.openOutputStream(uri)?.use { out ->
-                    dbFile.inputStream().use { it.copyTo(out) }
-                }
-            } else {
-                @Suppress("DEPRECATION")
-                val downloads = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
-                val folder = File(downloads, BACKUP_FOLDER).apply { mkdirs() }
-                val target = File(folder, fileName)
-                dbFile.inputStream().use { input ->
-                    target.outputStream().use { output -> input.copyTo(output) }
-                }
-            }
+        pagerAdapter = CategoryPagerAdapter(this)
+        binding.viewPager.adapter = pagerAdapter
 
-            pruneOldBackups(context)
-        } catch (_: Exception) {
-            // Backups are best-effort: never crash the app (or block a check-in/out) over this.
-        }
-    }
-
-    /** Keeps only the most recent [MAX_BACKUPS] copies to avoid filling up the device's storage. */
-    private fun pruneOldBackups(context: Context) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) return
-        val resolver = context.contentResolver
-        val projection = arrayOf(MediaStore.MediaColumns._ID, MediaStore.MediaColumns.DATE_ADDED)
-        val selection = "${MediaStore.MediaColumns.RELATIVE_PATH} LIKE ?"
-        val selectionArgs = arrayOf("%${Environment.DIRECTORY_DOWNLOADS}/$BACKUP_FOLDER%")
-
-        val ids = mutableListOf<Pair<Long, Long>>()
-        resolver.query(
-            MediaStore.Downloads.EXTERNAL_CONTENT_URI,
-            projection,
-            selection,
-            selectionArgs,
-            "${MediaStore.MediaColumns.DATE_ADDED} DESC"
-        )?.use { cursor ->
-            val idCol = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns._ID)
-            val dateCol = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATE_ADDED)
-            while (cursor.moveToNext()) {
-                ids += cursor.getLong(idCol) to cursor.getLong(dateCol)
-            }
-        }
-        if (ids.size > MAX_BACKUPS) {
-            for ((id, _) in ids.drop(MAX_BACKUPS)) {
-                val uri = MediaStore.Downloads.EXTERNAL_CONTENT_URI.buildUpon().appendPath(id.toString()).build()
-                resolver.delete(uri, null, null)
-            }
-        }
-    }
-
-    private fun timestamp(): String =
-        SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date())
-
-    class BackupWorker(context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {
-        override suspend fun doWork(): Result {
-            backupNow(applicationContext)
-            return Result.success()
-        }
-    }
-
-    fun schedulePeriodicBackup(context: Context) {
-        val backupRequest = PeriodicWorkRequestBuilder<BackupWorker>(24, TimeUnit.HOURS).build()
-        WorkManager.getInstance(context).enqueueUniquePeriodicWork(
-            "daily_backup",
-            ExistingPeriodicWorkPolicy.KEEP,
-            backupRequest
+        val tabIcons = intArrayOf(
+            R.drawable.ic_personnel,
+            R.drawable.ic_machinery,
+            R.drawable.ic_visitor,
+            R.drawable.ic_driver
         )
+        val tabTitles = arrayOf(
+            getString(R.string.category_personnel),
+            getString(R.string.category_machinery),
+            getString(R.string.category_visitor),
+            getString(R.string.category_driver)
+        )
+
+        TabLayoutMediator(binding.tabLayout, binding.viewPager) { tab, position ->
+            tab.text = tabTitles[position]
+            tab.setIcon(tabIcons[position])
+        }.attach()
+
+        // Jump directly to a tab, e.g. when returning from global search.
+        intent?.getStringExtra(EXTRA_JUMP_TO_TYPE)?.let { typeName ->
+            val type = runCatching { PersonType.valueOf(typeName) }.getOrNull()
+            type?.let { binding.viewPager.setCurrentItem(pagerAdapter.positionOf(it), false) }
+        }
+
+        // Show/hide buttons based on user role
+        setupButtonVisibility()
+    }
+
+    private fun setupButtonVisibility() {
+        val userRole = AppPreferences.getUserRole()
+        if (userRole == "ROLE_GUARD") {
+            binding.btnAdminDashboard.visibility = View.GONE
+            binding.btnSettings.visibility = View.GONE
+        }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.menu_main, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.action_dashboard -> {
+                startActivity(Intent(this, AdminDashboardActivity::class.java))
+                true
+            }
+            R.id.action_search -> {
+                startActivity(Intent(this, GlobalSearchActivity::class.java))
+                true
+            }
+            R.id.action_report -> {
+                startActivity(Intent(this, ReportActivity::class.java))
+                true
+            }
+            R.id.action_setup -> {
+                startActivity(Intent(this, SetupActivity::class.java))
+                true
+            }
+            R.id.action_settings -> {
+                startActivity(Intent(this, SettingsActivity::class.java))
+                true
+            }
+            R.id.action_web_panel -> {
+                openWebAdminPanel()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+    private fun openWebAdminPanel() {
+        val url = AppPreferences.getAdminPanelUrl(this)
+        if (url.isBlank()) {
+            MaterialAlertDialogBuilder(this)
+                .setTitle(R.string.web_panel_url_missing_title)
+                .setMessage(R.string.web_panel_url_missing_message)
+                .setPositiveButton(R.string.ai_open_settings) { _, _ ->
+                    startActivity(Intent(this, SettingsActivity::class.java))
+                }
+                .setNegativeButton(R.string.btn_cancel, null)
+                .show()
+            return
+        }
+        val fullUrl = if (url.startsWith("http://") || url.startsWith("https://")) url else "https://$url"
+        runCatching {
+            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(fullUrl)))
+        }.onFailure { exception ->
+            exception.printStackTrace()
+        }
+    }
+
+    companion object {
+        const val EXTRA_JUMP_TO_TYPE = "extra_jump_to_type"
     }
 }
