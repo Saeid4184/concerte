@@ -6,7 +6,6 @@ import androidx.room.PrimaryKey
 
 /**
  * A registered person / machine / driver / visitor.
- *
  * [isInside] is the single source of truth for whether they are currently inside the factory;
  * it is what enforces the "no duplicate check-in" business rule.
  * [group] is the sub-category used for sectioned lists: a department name for personnel,
