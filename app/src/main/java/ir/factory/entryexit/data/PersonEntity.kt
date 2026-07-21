@@ -31,4 +31,3 @@ binding.btnCheckIn.setOnClickListener {
     lastClickTime = SystemClock.elapsedRealtime()
     // عملیات ثبت
 }
-)
