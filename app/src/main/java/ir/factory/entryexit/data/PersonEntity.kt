@@ -1,33 +1,32 @@
-import androidx.room.ColumnInfo
-import androidx.room.Entity
-import androidx.room.PrimaryKey
-
 package ir.factory.entryexit.data
-/**
- * A registered person / machine / driver / visitor.
- *
- * [isInside] is the single source of truth for whether they are currently inside the factory;
- * it is what enforces the "no duplicate check-in" business rule.
- * [group] is the sub-category used for sectioned lists: a department name for personnel,
- * or a fleet/model group (e.g. "میکسر - آمیکو") for machinery. Null for visitors/drivers.
- * [imageUri] is a persisted content:// URI to a profile/equipment photo picked from the
- * device gallery during setup; null falls back to a text/icon placeholder.
- * [lastEventAt] is updated on every check-in/out and used to sort "currently inside" lists
- * by recency.
- */
-@Entity(tableName = "persons")
-data class PersonEntity(
-    @PrimaryKey(autoGenerate = true) val id: Long = 0,
-    val name: String,
-    val type: String, // matches PersonType.name
-    @ColumnInfo(name = "group_name") val group: String? = null,
-    val extraInfo: String? = null,
-    val imageUri: String? = null,
-    val isInside: Boolean = false,
-    val lastEventAt: Long = 1L,
-    var lastClickTime = 1L,
-binding.btnCheckIn.setOnClickListener {
-    if (SystemClock.elapsedRealtime - lastClickTime < 1500) return@setOnClickListener
-    lastClickTime = SystemClock.elapsedRealtime
-    // عملیات ثبت
+
+import android.content.Context
+import androidx.room.Database
+import androidx.room.Room
+import androidx.room.RoomDatabase
+import net.zetetic.android.database.sqlcipher.SupportFactory
+
+@Database(entities = [PersonEntity::class, LogEntity::class], version = 1, exportSchema = false)
+abstract class AppDatabase : RoomDatabase() {
+
+    abstract fun personDao(): PersonDao
+    abstract fun logDao(): LogDao
+
+    companion object {
+        @Volatile
+        private var INSTANCE: AppDatabase? = null
+
+        const val DB_NAME = "factory_entry_exit.db"
+
+        fun getInstance(context: Context): AppDatabase {
+            return INSTANCE ?: synchronized(this) {
+                val factory = SupportFactory("FactorySecurePass2026!".toByteArray())
+                val instance = Room.databaseBuilder(context, AppDatabase::class.java, DB_NAME)
+                    .openHelperFactory(factory)
+                    .build()
+                INSTANCE = instance
+                instance
+            }
+        }
+    }
 }
