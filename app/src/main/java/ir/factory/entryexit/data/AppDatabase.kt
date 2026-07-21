@@ -1,5 +1,6 @@
-package ir.factory.entryexitdata
+package ir.factory.entryexit.data
 package net.zetetic:android-database-sqlcipher
+
 import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
