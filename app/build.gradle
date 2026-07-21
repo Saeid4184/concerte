@@ -68,7 +68,7 @@ dependencies {
     ksp 'androidx.room:room-compiler:2.6.1'
 
     debugimplementation 'com.squareup.leakcanary:leakcanary-android:2.14'
-class FactoryViewModel @Inject constructor(private val repository: Repository) : ViewModel() {
+class FactoryViewModel Inject constructor(private val repository: Repository) : ViewModel() {
     val reportStats = repository.getLogs().map { logs ->
 
 
