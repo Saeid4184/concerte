@@ -109,9 +109,19 @@ class MainActivity : AppCompatActivity() {
         }
     }
     
-    if (AppPreferences.getUserRole) == "ROLE_GUARD") {
-    binding.btnAdminDashboard.visibility = View.GONE // مخفی کردن پنل ادمین
-    binding.btnSettings.visibility = View.GONE
+  override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
+    binding = ActivityMainBinding.inflate(layoutInflater)
+    setContentView(binding.root)
+    
+    // ... existing code ...
+    
+    // Add this block here
+    if (AppPreferences.getUserRole() == "ROLE_GUARD") {
+        binding.btnAdminDashboard.visibility = View.GONE
+        binding.btnSettings.visibility = View.GONE
+    }
+}
 }
     companion object {
         const val EXTRA_JUMP_TO_TYPE = "extra_jump_to_type"
