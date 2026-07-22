@@ -132,12 +132,4 @@ class GroupedPersonAdapter(
             binding.root.setOnClickListener { onClick(person) }
             binding.root.setOnLongClickListener {
                 onLongClick(person)
-
                 }
-
-
-    companion object {
-        private const val VIEW_TYPE_HEADER = 0
-        private const val VIEW_TYPE_ITEM = 1
-    }
-}
