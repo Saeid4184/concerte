@@ -133,14 +133,7 @@ class GroupedPersonAdapter(
             binding.root.setOnLongClickListener {
                 onLongClick(person)
 
-                
-            ثبت خروج در دیتابیس
-        
-        Snackbar.make(binding.root, "${log.name} خارج شد", Snackbar.LENGTH_LONG)
-            .setAction("لغو (Undo)") {
-                viewModel.undoCheckOut(log) // بازگردانی رکورد
-            }.show()
-    }
+                }
 })
 itemTouchHelper.attachToRecyclerView(binding.recyclerView)
                 true
