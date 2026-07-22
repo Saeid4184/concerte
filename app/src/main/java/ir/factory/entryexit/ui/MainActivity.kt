@@ -14,7 +14,7 @@ import ir.factory.entryexit.data.PersonType
 import ir.factory.entryexit.databinding.ActivityMainBinding
 import ir.factory.entryexit.util.AppPreferences
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : (AppCompatActivity) {
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var pagerAdapter: CategoryPagerAdapter
@@ -59,13 +59,6 @@ class MainActivity : AppCompatActivity() {
         setupButtonVisibility()
     }
 
-    private fun setupButtonVisibility() {
-        val userRole = AppPreferences.getUserRole()
-        if (userRole == "ROLE_GUARD") {
-            binding.btnAdminDashboard.visibility = View.GONE
-            binding.btnSettings.visibility = View.GONE
-        }
-    }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.menu_main, menu)
