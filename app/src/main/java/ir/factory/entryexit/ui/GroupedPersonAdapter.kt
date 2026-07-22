@@ -134,11 +134,7 @@ class GroupedPersonAdapter(
                 onLongClick(person)
 
                 }
-})
-itemTouchHelper.attachToRecyclerView(binding.recyclerView)
-                true
-            }
-        }
+
 
     companion object {
         private const val VIEW_TYPE_HEADER = 0
