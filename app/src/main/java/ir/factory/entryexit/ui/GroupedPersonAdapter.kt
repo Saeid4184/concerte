@@ -135,4 +135,5 @@ class GroupedPersonAdapter(
             true  // Return true to consume the long click
             }
         }
-     }
+        }
+}
