@@ -134,3 +134,5 @@ class GroupedPersonAdapter(
             onLongClick(person)
             true  // Return true to consume the long click
             }
+        }
+     }
