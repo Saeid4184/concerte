@@ -133,3 +133,4 @@ class GroupedPersonAdapter(
             binding.root.setOnLongClickListener {
                 onLongClick(person)
             }
+        }
