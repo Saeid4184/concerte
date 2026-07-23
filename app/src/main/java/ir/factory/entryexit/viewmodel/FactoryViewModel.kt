@@ -11,6 +11,7 @@ import ir.factory.entryexit.data.LogEntity
 import ir.factory.entryexit.data.PersonEntity
 import ir.factory.entryexit.data.PersonType
 import ir.factory.entryexit.data.Repository
+import ir.factory.entryexit.util.BackupManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -97,7 +98,7 @@ class FactoryViewModel(app: Application) : AndroidViewModel(app) {
 
     private suspend fun triggerBackup() {
         withContext(Dispatchers.IO) {
-            ir.factory.entryexit.util.BackupManager.backupNow(getApplication())
+            BackupManager.backupNow(getApplication())
         }
     }
 

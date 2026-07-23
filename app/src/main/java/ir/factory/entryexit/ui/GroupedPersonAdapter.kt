@@ -10,6 +10,7 @@ import ir.factory.entryexit.data.PersonEntity
 import ir.factory.entryexit.data.PersonType
 import ir.factory.entryexit.databinding.ItemRosterEntryBinding
 import ir.factory.entryexit.databinding.ItemSectionHeaderBinding
+
 /** A single row shown in the roster list: either a section header or a person/machine entry. */
 sealed class RosterRow {
     data class Header(val title: String) : RosterRow()
@@ -28,6 +29,11 @@ class GroupedPersonAdapter(
     private val onClick: (PersonEntity) -> Unit,
     private val onLongClick: (PersonEntity) -> Unit = {}
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+
+    companion object {
+        const val VIEW_TYPE_HEADER = 0
+        const val VIEW_TYPE_ITEM = 1
+    }
 
     private var rows: List<RosterRow> = emptyList()
 
@@ -131,9 +137,9 @@ class GroupedPersonAdapter(
 
             binding.root.setOnClickListener { onClick(person) }
             binding.root.setOnLongClickListener {
-            onLongClick(person)
-            true  // Return true to consume the long click
+                onLongClick(person)
+                true  // Return true to consume the long click
             }
         }
-        }
+    }
 }
