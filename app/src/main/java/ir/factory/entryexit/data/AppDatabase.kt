@@ -5,6 +5,7 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import net.zetetic.database.sqlcipher.SupportFactory
+import net.sqlcipher.database.SupportFactory
 
 @Database(entities = [PersonEntity::class, LogEntity::class], version = 1, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
