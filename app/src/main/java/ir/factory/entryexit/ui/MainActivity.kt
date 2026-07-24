@@ -112,7 +112,7 @@ class MainActivity : ComponentActivity() { // Added ()
             exception.printStackTrace()
         }
 
-        companion object {
+        companion object() {
         const val EXTRA_JUMP_TO_TYPE = "extra_jump_to_type"
     }
 }
