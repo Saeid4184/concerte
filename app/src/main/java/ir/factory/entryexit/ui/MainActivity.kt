@@ -56,10 +56,6 @@ class MainActivity : ComponentActivity() { // Added ()
             type?.let { binding.viewPager.setCurrentItem(pagerAdapter.positionOf(it), false) }
         }
 
-        // Show/hide buttons based on user role
-        setupButtonVisibility()
-    }
-
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.menu_main, menu)
