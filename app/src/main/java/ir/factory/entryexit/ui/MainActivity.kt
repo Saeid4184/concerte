@@ -14,8 +14,8 @@ import ir.factory.entryexit.data.PersonType
 import ir.factory.entryexit.databinding.ActivityMainBinding
 import ir.factory.entryexit.util.AppPreferences
 
-class MainActivity : ComponentActivity { // Missing parentheses
-        
+class MainActivity : ComponentActivity() { // Added ()
+                
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var pagerAdapter: CategoryPagerAdapter
