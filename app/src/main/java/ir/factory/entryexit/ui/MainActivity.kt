@@ -117,3 +117,5 @@ class MainActivity : ComponentActivity() { // Added ()
         const val EXTRA_JUMP_TO_TYPE = "extra_jump_to_type"
     }
 }
+}
+}
