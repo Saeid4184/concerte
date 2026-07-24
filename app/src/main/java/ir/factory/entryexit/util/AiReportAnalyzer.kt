@@ -9,6 +9,7 @@ import java.net.HttpURLConnection
 import java.net.URL
 import java.nio.charset.StandardCharsets
 import ir.factory.entryexit.data.LogEntity // Adjust package path to where your entity actually lives
+import java.util.concurrent.TimeUnit
 
 /**
  * Sends an aggregated, already-anonymized text summary of a report (never raw personal names)
